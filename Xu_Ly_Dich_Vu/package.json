@@ -1,0 +1,20 @@
+{
+  "name": "quanlynhanviengdu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cryptr": "^6.0.2",
+    "firebase-admin": "^8.12.1",
+    "nodemailer": "^6.4.6",
+    "random-number": "0.0.9"
+  }
+}

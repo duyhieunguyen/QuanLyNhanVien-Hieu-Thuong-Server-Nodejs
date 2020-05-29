@@ -3,6 +3,7 @@ var database = require("./XU_LY_DU_LIEU/firebase");
 var port = normalizePort(process.env.PORT || 3000);
 var xu_ly_tham_so = require("querystring");
 //Random-number xác thực email
+//npm install random-number
 var rn = require('random-number');
 var options = {
     min: 100000
@@ -10,12 +11,12 @@ var options = {
     , integer: true
 }
 //Send Mail
+//npm install nodemailer
 var nodemailer = require('nodemailer');
 //Ma Hoa va Giai ma Cryptr
+//npm install cryptr
 var Cryptr = require('cryptr')
 cryptr = new Cryptr('duyhieu')
-var encstring;
-var decstring;
 
 var du_lieu = {}
 var danh_sach_nguoi_dung = database.get_list_nhan_vien();
@@ -41,10 +42,9 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "Them_Du_Lieu_Firebase") {
-
-            var kq = true;
             var nguoiDung = JSON.parse(chuoi_nhan);
             nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
+            var kq = true;
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
@@ -53,15 +53,16 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
                     kq = false
                     chuoi_kq = 'emailExist'
-                    console.log(chuoi_kq)
 
                 }
             })
             if (kq == true) {
                 database.them_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
-                var number = rn(options);
 
-                //console.log(number)
+                //Tạo number random cho xác thực gmail
+                var number = rn(options);
+                
+                //Cách send email
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
@@ -86,7 +87,6 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     }
                 });
                 chuoi_kq = JSON.stringify(number)
-                //console.log(chuoi_kq)
                 du_lieu.danh_sach_nguoi_dung.push(nguoiDung);
             }
             dap_ung.end(chuoi_kq);
@@ -125,7 +125,49 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 chuoi_kq = "loginfalse"
             }
             dap_ung.end(chuoi_kq);
-        } else if (ma_so_xu_ly == "Forgot_Password") {
+        } else if (ma_so_xu_ly == "LoginGoogle") {
+            var nguoiDung = JSON.parse(chuoi_nhan)
+            var kq = false;
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
+                    kq = true;
+                    chuoi_kq = JSON.stringify(nguoiDungDB)
+                }
+            })
+            
+            if (kq == false) {
+                chuoi_kq = JSON.stringify("loginGoogleFalse")
+            }
+
+            dap_ung.end(chuoi_kq);
+        }else if(ma_so_xu_ly == "RegisterGoogle"){
+            var nguoiDung = JSON.parse(chuoi_nhan);
+            console.log(nguoiDung)
+            var kq = true;
+            nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
+                    kq = false
+                    chuoi_kq = "emailGoogleExist"
+                    
+                }
+            })
+
+            if(kq == true){
+                database.them_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
+                du_lieu.danh_sach_nguoi_dung.push(nguoiDung);
+            }
+            dap_ung.end(chuoi_kq);
+        }
+        else if (ma_so_xu_ly == "Forgot_Password") {
             var kq = true;
             var nguoiDung = JSON.parse(chuoi_nhan)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
@@ -139,9 +181,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
 
                 }
             })
-            
-            if(kq == true)
-            {
+            if (kq == true) {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
@@ -155,7 +195,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     to: nguoiDung.Email,
                     subject: 'ForgotPassword',
                     //html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword https://quanlynhanviengdu.github.io/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    //html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
                 };
 
                 transporter.sendMail(mailOptions, function (error, info) {
@@ -165,9 +206,9 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                         console.log('Email sent: ' + info.response);
                     }
                 });
-               
+
             }
-            else{
+            else {
                 chuoi_kq = 'emailNotExist'
             }
             dap_ung.end(chuoi_kq);

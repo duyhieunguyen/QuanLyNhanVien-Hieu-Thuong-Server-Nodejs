@@ -2,6 +2,8 @@ var http = require("http");
 var database = require("./XU_LY_DU_LIEU/firebase");
 var port = normalizePort(process.env.PORT || 3000);
 var xu_ly_tham_so = require("querystring");
+
+
 //Random-number xác thực email
 //npm install random-number
 var rn = require('random-number');
@@ -61,7 +63,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
 
                 //Tạo number random cho xác thực gmail
                 var number = rn(options);
-                
+
                 //Cách send email
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
@@ -90,8 +92,68 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 du_lieu.danh_sach_nguoi_dung.push(nguoiDung);
             }
             dap_ung.end(chuoi_kq);
-        }
-        else if (ma_so_xu_ly == "Sua_Du_Lieu_Firebase") {
+        } else if (ma_so_xu_ly == "Them_Du_Lieu_Nhan_Vien_Firebase") {
+            //Thêm nhân viên không cần qua bước xác thực
+            var nguoiDung = JSON.parse(chuoi_nhan);
+            console.log(nguoiDung)
+            nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
+            var kq = true;
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
+                    kq = false
+                    chuoi_kq = JSON.stringify("emailExist");
+                }
+            })
+            if (kq == true) {
+                database.them_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
+                du_lieu.danh_sach_nguoi_dung.push(nguoiDung);
+            }
+
+            dap_ung.end(chuoi_kq);
+        } else if (ma_so_xu_ly == "Sua_Du_Lieu_Firebase") {
+            var nguoiDung = JSON.parse(chuoi_nhan);
+            //nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
+                    //nguoiDungDB.Account.Password = nguoiDung.Account.Password;
+                    nguoiDungDB.Account.Role = nguoiDung.Account.Role;
+                    nguoiDungDB.FullName = nguoiDung.FullName;
+                    nguoiDung = nguoiDungDB;
+
+                }
+            })
+            database.sua_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
+            dap_ung.end(chuoi_kq);
+        } else if (ma_so_xu_ly == "Kiem_Tra_Mat_Khau_Du_Firebase") {
+            var nguoiDung = JSON.parse(chuoi_nhan);
+            var kq = false
+            //nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
+                    if (nguoiDung.Account.Password == cryptr.decrypt(nguoiDungDB.Account.Password)){
+                        kq = true
+                        chuoi_kq = JSON.stringify(nguoiDungDB)
+                    }
+                }
+            })
+            if (kq == false) {
+                chuoi_kq = JSON.stringify("errorPassword")
+            }
+
+            dap_ung.end(chuoi_kq);
+        } else if (ma_so_xu_ly == "Doi_Mat_Khau_Du_Firebase") {
             var nguoiDung = JSON.parse(chuoi_nhan);
             nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
@@ -101,9 +163,10 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
                     nguoiDungDB.Account.Password = nguoiDung.Account.Password;
+                    nguoiDung = nguoiDungDB;
                 }
             })
-            var Kq = database.sua_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
+            database.sua_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
             dap_ung.end(chuoi_kq);
         } else if (ma_so_xu_ly == "Login") {
             var nguoiDung = JSON.parse(chuoi_nhan)
@@ -113,7 +176,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
-                if (nguoiDung.UserName.trim() == nguoiDungDB.Account.UserName.trim()) {
+                if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
                     if (nguoiDung.Password == cryptr.decrypt(nguoiDungDB.Account.Password)) {
                         kq = true;
                         chuoi_kq = JSON.stringify(nguoiDungDB)
@@ -122,7 +185,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             })
 
             if (kq == false) {
-                chuoi_kq = "loginfalse"
+                chuoi_kq = JSON.stringify("loginfalse")
             }
             dap_ung.end(chuoi_kq);
         } else if (ma_so_xu_ly == "LoginGoogle") {
@@ -138,13 +201,13 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     chuoi_kq = JSON.stringify(nguoiDungDB)
                 }
             })
-            
+
             if (kq == false) {
                 chuoi_kq = JSON.stringify("loginGoogleFalse")
             }
 
             dap_ung.end(chuoi_kq);
-        }else if(ma_so_xu_ly == "RegisterGoogle"){
+        } else if (ma_so_xu_ly == "RegisterGoogle") {
             var nguoiDung = JSON.parse(chuoi_nhan);
             console.log(nguoiDung)
             var kq = true;
@@ -156,19 +219,19 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
                     kq = false
-                    chuoi_kq = "emailGoogleExist"
-                    
+                    chuoi_kq = "emailGoogleExist";
+
                 }
             })
 
-            if(kq == true){
+            if (kq == true) {
                 database.them_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
                 du_lieu.danh_sach_nguoi_dung.push(nguoiDung);
             }
             dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "Forgot_Password") {
-            var kq = true;
+            var kq = false;
             var nguoiDung = JSON.parse(chuoi_nhan)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -195,8 +258,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     to: nguoiDung.Email,
                     subject: 'ForgotPassword',
                     //html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword https://quanlynhanviengdu.github.io/views/resetPassword.html?email=${nguoiDung.Email}</p>`
-                    //html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    //html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword https://quanlynhanviengdu.github.io/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
                 };
 
                 transporter.sendMail(mailOptions, function (error, info) {
@@ -209,7 +272,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
 
             }
             else {
-                chuoi_kq = 'emailNotExist'
+                chuoi_kq = JSON.stringify("emailNotExist")
             }
             dap_ung.end(chuoi_kq);
         }

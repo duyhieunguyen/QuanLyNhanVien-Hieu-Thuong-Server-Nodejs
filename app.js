@@ -75,6 +75,14 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(nhanvien);
             nhanvien.Account.Password = cryptr.encrypt(nhanvien.Account.Password);
+            if(nhanvien.Account.Role.trim() = "manage")
+            {
+                nhanvien.Account.Role = "admin";
+            }
+            else
+            {
+                nhanvien.Account.Role = "user";
+            }
             kq = database.Ghi_moi_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName);
             du_lieu.danh_sach_nguoi_dung.push(nhanvien);
             if (kq == "") {

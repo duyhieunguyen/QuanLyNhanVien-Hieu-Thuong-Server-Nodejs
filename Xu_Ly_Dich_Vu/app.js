@@ -12,6 +12,7 @@ var options = {
     , max: 999999
     , integer: true
 }
+
 //Send Mail
 //npm install nodemailer
 var nodemailer = require('nodemailer');
@@ -258,8 +259,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     to: nguoiDung.Email,
                     subject: 'ForgotPassword',
                     //html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-                    //html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword https://quanlynhanviengdu.github.io/views/resetPassword.html?email=${nguoiDung.Email}</p>`
-                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword https://nhanvien.daihocgiadinh.edu.vn/views/resetPassword.html?email=${nguoiDung.Email}</p>`
+                    // html: `<h1>Welcome to ĐH Gia Định</h1><p>Link resetpassword http://127.0.0.1:5501/views/resetPassword.html?email=${nguoiDung.Email}</p>`
                 };
 
                 transporter.sendMail(mailOptions, function (error, info) {

@@ -24,7 +24,7 @@ cryptr = new Cryptr('duyhieu')
 var du_lieu = {}
 
 var danh_sach_nguoi_dung = database.get_list_nhan_vien();
-
+var kq = "";
 danh_sach_nguoi_dung.then(kq => {
     du_lieu.danh_sach_nguoi_dung = kq;
 })
@@ -46,65 +46,66 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VADoc_Danh_sach_Nhan_vien") {
-            var Doi_tuong_Kq = {}
-            Doi_tuong_Kq = du_lieu.danh_sach_nguoi_dung
-            Chuoi_Kq = JSON.stringify(Doi_tuong_Kq)
+            var Doi_tuong_kq = {}
+            Doi_tuong_kq = du_lieu.danh_sach_nguoi_dung
+            chuoi_kq = JSON.stringify(Doi_tuong_kq)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         } 
         else if (ma_so_xu_ly == "VAKet_noi_tu_winform") {
 
             console.log("ok kết nối thành công");
-            console.log(Chuoi_Nhan);
+            console.log(chuoi_nhan);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
-            Chuoi_Kq = Chuoi_Nhan;
-            dap_ung.end(Chuoi_Kq);
+            chuoi_kq = chuoi_nhan;
+            dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VAThem_nhan_vien_moi_mssql") {
-            var nhanvien = JSON.parse(Chuoi_Nhan);
+            var nhanvien = JSON.parse(chuoi_nhan);
+            //console.log(nhanvien);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(nhanvien);
-            Kq = database.Ghi_moi_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName);
+            kq = database.Ghi_moi_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName);
             du_lieu.danh_sach_nguoi_dung.push(nhanvien);
-            if (Kq == "") {
-                Chuoi_Kq = "OK"
+            if (kq == "") {
+                chuoi_kq = "OK"
                 console.log("Thêm thành công");
             } else {
-                Chuoi_Kq = "Error"
+                chuoi_kq = "Error"
             }
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VAThem_gop_y") {
-            var feedback = JSON.parse(Chuoi_Nhan);
+            var feedback = JSON.parse(chuoi_nhan);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(feedback);
-            Kq = database.Ghi_moi_Doi_tuong_Khong_Id('feedbacks', feedback);
+            kq = database.Ghi_moi_Doi_tuong_Khong_Id('feedbacks', feedback);
             //du_lieu.Danh_sach_Nhan_vien.push(nhanvien);
-            if (Kq == "") {
-                Chuoi_Kq = "OK"
+            if (kq == "") {
+                chuoi_kq = "OK"
                 console.log("Thêm thành công");
             } else {
-                Chuoi_Kq = "Error"
+                chuoi_kq = "Error"
             }
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VACap_nhat_tai_khoan") {
-            var Kq = ""
+            var kq = ""
             console.log("-------------------->>>");
-            console.log(Chuoi_Nhan);
-            var nhanvien = JSON.parse(Chuoi_Nhan)
+            console.log(chuoi_nhan);
+            var nhanvien = JSON.parse(chuoi_nhan)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
@@ -120,18 +121,18 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     employeeDB.Account.Password = nhanvien.Account.Password;
                 }
             });
-            Kq = database.Cap_nhat_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName)
-            if (Kq == "") {
-                Chuoi_Kq = "OK"
+            kq = database.Cap_nhat_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName)
+            if (kq == "") {
+                chuoi_kq = "OK"
             } else {
-                Chuoi_Kq = "Error"
+                chuoi_kq = "Error"
             }
 
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VAThem_Lich_bieu") {
-            var Kq = ""
-            var Data = JSON.parse(Chuoi_Nhan)
+            var kq = ""
+            var Data = JSON.parse(chuoi_nhan)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
@@ -154,18 +155,18 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             console.log(Dieu_kien);
             console.log(dataUpdate);
             //du_lieu.Danh_sach_Cau_hoi.question_list = Cau_hoi.question_list;
-            Kq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
-            if (Kq == "") {
-                Chuoi_Kq = "OK"
+            kq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
+            if (kq == "") {
+                chuoi_kq = "OK"
             } else {
-                Chuoi_Kq = "Error"
+                chuoi_kq = "Error"
             }
 
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VAlogin") {
             //console.log("Vào login nè");
-            var user  = JSON.parse(Chuoi_Nhan)
+            var user  = JSON.parse(chuoi_nhan)
             //console.log(user);
             var checkLogin  = false;
             var user_return  = {};
@@ -183,18 +184,18 @@ var server = http.createServer((yeu_cau, dap_ung) => {
 
             if(checkLogin == false)
             {
-                Chuoi_Kq = "login_fail";
+                chuoi_kq = "login_fail";
             }
             else
             {
-                Chuoi_Kq = JSON.stringify(user_return)
+                chuoi_kq = JSON.stringify(user_return)
             }
-            //console.log(Chuoi_Kq);
+            //console.log(chuoi_kq);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
-            dap_ung.end(Chuoi_Kq);
+            dap_ung.end(chuoi_kq);
         }
 
         else if (ma_so_xu_ly == "Them_Du_Lieu_Firebase") {

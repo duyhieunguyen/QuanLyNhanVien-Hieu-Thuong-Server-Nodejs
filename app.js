@@ -183,7 +183,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 //console.log(userDB)
                 if(user.UserName.trim() == userDB.Account.UserName.trim())
                 {
-                    if( user.Password.trim() == cryptr.decrypt(nguoiDungDB.Account.Password))
+                    if( user.Password.trim() == cryptr.decrypt(userDB.Account.Password))
                     {
                         checkLogin = true;
                         user_return = userDB;

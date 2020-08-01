@@ -73,7 +73,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(nhanvien);
-            Kq = database.Ghi_moi_Doi_tuong('employees', nhanvien, nhanvien.Account.UserName);
+            Kq = database.Ghi_moi_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName);
             du_lieu.danh_sach_nguoi_dung.push(nhanvien);
             if (Kq == "") {
                 Chuoi_Kq = "OK"
@@ -120,7 +120,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     employeeDB.Account.Password = nhanvien.Account.Password;
                 }
             });
-            Kq = database.Cap_nhat_Doi_tuong('employees', nhanvien, nhanvien.Account.UserName)
+            Kq = database.Cap_nhat_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName)
             if (Kq == "") {
                 Chuoi_Kq = "OK"
             } else {
@@ -154,7 +154,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             console.log(Dieu_kien);
             console.log(dataUpdate);
             //du_lieu.Danh_sach_Cau_hoi.question_list = Cau_hoi.question_list;
-            Kq = database.Them_lich_bieu('employees', nhanvien, nhanvien.Account.UserName)
+            Kq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
             if (Kq == "") {
                 Chuoi_Kq = "OK"
             } else {

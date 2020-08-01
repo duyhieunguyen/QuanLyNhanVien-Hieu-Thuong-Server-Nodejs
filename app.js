@@ -74,7 +74,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(nhanvien);
-            nhanvien.Password = cryptr.encrypt(nhanvien.Password);
+            nhanvien.Account.Password = cryptr.encrypt(nhanvien.Account.Password);
             kq = database.Ghi_moi_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName);
             du_lieu.danh_sach_nguoi_dung.push(nhanvien);
             if (kq == "") {

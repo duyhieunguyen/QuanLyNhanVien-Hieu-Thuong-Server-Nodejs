@@ -174,16 +174,16 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.end(chuoi_kq);
         }
         else if (ma_so_xu_ly == "VAlogin") {
-            //console.log("Vào login nè");
+            console.log("Vào login nè");
             var user  = JSON.parse(chuoi_nhan)
-            //console.log(user);
+            console.log(user);
             var checkLogin  = false;
             var user_return  = {};
             du_lieu.danh_sach_nguoi_dung.forEach(userDB=>{
                 //console.log(userDB)
                 if(user.UserName.trim() == userDB.Account.UserName.trim())
                 {
-                    if( user.Password.trim() == cryptr.decrypt(userDB.Account.Password.trim()))
+                    if( user.Password.trim() == cryptr.decrypt(nguoiDungDB.Account.Password))
                     {
                         checkLogin = true;
                         user_return = userDB;

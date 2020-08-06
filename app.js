@@ -75,7 +75,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             console.log(nhanvien);
             nhanvien.Account.Password = cryptr.encrypt(nhanvien.Account.Password);
-            if(nhanvien.Account.Role.trim() == "manage")
+            if(nhanvien.Account.Role.trim() == "manage")//restart
             {
                 nhanvien.Account.Role = "admin";
             }

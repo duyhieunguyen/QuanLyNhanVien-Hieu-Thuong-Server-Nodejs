@@ -237,13 +237,13 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'duyhieudev0507@gmail.com',
-                        pass: '05070812aa'
+                        user: 'giadinh.gdu@gmail.com',
+                        pass: 'thanhthuongnghia'
                     }
                 });
 
                 var mailOptions = {
-                    from: 'duyhieudev0507@gmail.com',
+                    from: 'giadinh.gdu@gmail.com',
                     to: nguoiDung.Email,
                     subject: 'Xác thực email',
                     //html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
@@ -432,13 +432,13 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'duyhieudev0507@gmail.com',
-                        pass: '05070812aa'
+                        user: 'giadinh.gdu@gmail.com',
+                        pass: 'thanhthuongnghia'
                     }
                 });
 
                 var mailOptions = {
-                    from: 'duyhieudev0507@gmail.com',
+                    from: 'giadinh.gdu@gmail.com',
                     to: nguoiDung.Email,
                     subject: 'ForgotPassword',
                     //html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 

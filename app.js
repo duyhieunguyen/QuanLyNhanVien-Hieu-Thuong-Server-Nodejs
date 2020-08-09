@@ -237,8 +237,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'giadinh.gdu@gmail.com',
-                        pass: 'thanhthuongnghia'
+                        user: 'duyhieudev0507@gmail.com',
+                        pass: '05070812aa'
                     }
                 });
 
@@ -439,8 +439,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 var transporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: 'giadinh.gdu@gmail.com',
-                        pass: 'thanhthuongnghia'
+                        user: 'duyhieudev0507@gmail.com',
+                        pass: '05070812aa'
                     }
                 });
 

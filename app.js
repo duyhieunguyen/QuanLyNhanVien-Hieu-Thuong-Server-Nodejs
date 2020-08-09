@@ -18,11 +18,11 @@ var options = {
 var nodemailer = require('nodemailer');
 //Ma Hoa va Giai ma Cryptr
 //npm install cryptr
-var Cryptr = require('cryptr')
-cryptr = new Cryptr('duyhieu')
+var Cryptr = require('cryptr');
+cryptr = new Cryptr('duyhieu');
 
-var bcrypt = require('bcrypt')
-var salt = bcrypt.genSaltSync(10)
+var bcrypt = require('bcrypt');
+var salt = bcrypt.genSaltSync(10);
 
 var du_lieu = {}
 
@@ -303,19 +303,25 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.end(chuoi_kq);
         } else if (ma_so_xu_ly == "Kiem_Tra_Mat_Khau_Du_Firebase") {
             var nguoiDung = JSON.parse(chuoi_nhan);
-            var kq = false
+            var kq = false;
             //nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
-            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*');
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
-                    if (bcrypt.compareSync(nguoiDung.Account.Password, nguoiDungDB.Account.Password) || (nguoiDung.Account.Password == cryptr.decrypt(nguoiDungDB.Account.Password))) {
-                        kq = true
-                        chuoi_kq = JSON.stringify(nguoiDungDB)
+                    try{
+                        if (bcrypt.compareSync(nguoiDung.Account.Password, nguoiDungDB.Account.Password) || (nguoiDung.Account.Password == cryptr.decrypt(nguoiDungDB.Account.Password)) ) {
+                            kq = true;
+                            chuoi_kq = JSON.stringify(nguoiDungDB);
+                        }
+                    }catch (e){
+                    
                     }
                 }
+               
+                    
             })
             if (kq == false) {
                 chuoi_kq = JSON.stringify("errorPassword")
@@ -325,14 +331,14 @@ var server = http.createServer((yeu_cau, dap_ung) => {
         } else if (ma_so_xu_ly == "Doi_Mat_Khau_Du_Firebase") {
             var nguoiDung = JSON.parse(chuoi_nhan);
             // nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
-            // nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt);
+            nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
-                    nguoiDungDB.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt);
+                    nguoiDungDB.Account.Password = nguoiDung.Account.Password;
                     nguoiDung = nguoiDungDB;
                 }
             })
@@ -360,12 +366,13 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 //Mã hóa 1 chiều bằng Bcrypt
 
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
-                    if (bcrypt.compareSync(nguoiDung.Password, nguoiDungDB.Account.Password) || (nguoiDung.Password == cryptr.decrypt(nguoiDungDB.Account.Password))) {
-                        kq = true;
-                        chuoi_kq = JSON.stringify(nguoiDungDB)
-                    }
+                     try{
+                        if (bcrypt.compareSync(nguoiDung.Password, nguoiDungDB.Account.Password) || nguoiDung.Password == cryptr.decrypt(nguoiDungDB.Account.Password)) {
+                            kq = true;
+                            chuoi_kq = JSON.stringify(nguoiDungDB)
+                        } 
+                    }catch(e){}
                 }
-               
             })
 
             if (kq == false) {
@@ -393,7 +400,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.end(chuoi_kq);
         } else if (ma_so_xu_ly == "RegisterGoogle") {
             var nguoiDung = JSON.parse(chuoi_nhan);
-            nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt)
+            // nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt)
             var kq = true;
             nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')

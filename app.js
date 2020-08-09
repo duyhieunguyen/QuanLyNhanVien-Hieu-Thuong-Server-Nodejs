@@ -301,7 +301,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             })
             database.sua_tai_khoan_nhan_vien('Employee', nguoiDung, nguoiDung.Email)
             dap_ung.end(chuoi_kq);
-        } else if (ma_so_xu_ly == "Kiem_Tra_Mat_Khau_Cu_Du_Firebase") {
+        } else if (ma_so_xu_ly == "Kiem_Tra_Mat_Khau_Du_Firebase") {
             var nguoiDung = JSON.parse(chuoi_nhan);
             var kq = false
             //nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
@@ -311,7 +311,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
-                    if (bcrypt.compareSync(nguoiDung.Account.Password, nguoiDungDB.Account.Password) || (nguoiDung.Account.Password == cryptr.decrypt(nguoiDungDB.Account.Password)) ){
+                    if (bcrypt.compareSync(nguoiDung.Account.Password, nguoiDungDB.Account.Password) || (nguoiDung.Account.Password == cryptr.decrypt(nguoiDungDB.Account.Password))) {
                         kq = true
                         chuoi_kq = JSON.stringify(nguoiDungDB)
                     }
@@ -325,14 +325,14 @@ var server = http.createServer((yeu_cau, dap_ung) => {
         } else if (ma_so_xu_ly == "Doi_Mat_Khau_Du_Firebase") {
             var nguoiDung = JSON.parse(chuoi_nhan);
             // nguoiDung.Account.Password = cryptr.encrypt(nguoiDung.Account.Password)
-            nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt)
+            // nguoiDung.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt);
             dap_ung.setHeader("Access-Control-Allow-Origin", '*')
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             du_lieu.danh_sach_nguoi_dung.forEach(nguoiDungDB => {
                 if (nguoiDung.Email.trim() == nguoiDungDB.Email.trim()) {
-                    nguoiDungDB.Account.Password = nguoiDung.Account.Password;
+                    nguoiDungDB.Account.Password = bcrypt.hashSync(nguoiDung.Account.Password, salt);
                     nguoiDung = nguoiDungDB;
                 }
             })

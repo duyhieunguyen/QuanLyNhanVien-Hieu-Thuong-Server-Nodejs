@@ -130,7 +130,8 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                     employeeDB.Address = nhanvien.Address;
                     employeeDB.Email = nhanvien.Email;
                     employeeDB.PhoneNumber = nhanvien.PhoneNumber;
-                    employeeDB.Account.Password = nhanvien.Account.Password;
+                    //employeeDB.Account.Password = nhanvien.Account.Password;
+                    employeeDB.Account.Password = bcrypt.hashSync(nhanvien.Account.Password, salt);
                 }
             });
             kq = database.Cap_nhat_Doi_tuong('Employee', nhanvien, nhanvien.Account.UserName)
@@ -149,24 +150,60 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
-            console.log("Vào");
-            console.log(Data);
+            console.log("Vào lịch nè");
+            //console.log(Data);
             var Dieu_kien = { "Email": Data.username }
             var dataUpdate = [];
             var nhanvien = {};
             du_lieu.danh_sach_nguoi_dung.forEach(dataSchedule => {
-                if (dataSchedule.Account.UserName.trim() ==Data.username.trim()) {
-                    Data.schedules.id = dataSchedule.Schedules.length;
-                    dataSchedule.Schedules.push(Data.schedules);
-                    dataUpdate = dataSchedule.Schedules;
-                    nhanvien = dataSchedule;
+                if (dataSchedule.Account.UserName.trim() == Data.username.trim()) {
+                    var flag = false;
+                    //console.log(dataSchedule.Schedules)
+                    console.log(Data)
+                    
+                    dataSchedule.Schedules.forEach(schedule=>{
+                        //console.log(schedule)
+                        if(Data.schedules.id == schedule.id)
+                        {
+                            if(Data.schedules.day_of_month == 0 && Data.schedules.hour == 0 && Data.schedules.minute == 0 && Data.schedules.year == 0)
+                            {
+                                var index =  dataSchedule.Schedules.indexOf(schedule);
+                                dataSchedule.Schedules.splice(index, 1);
+                                console.log("====>"+index);
+                                flag = true;
+                                nhanvien = dataSchedule;
+                            }
+                            else{
+                                console.log(schedule);
+                                schedule.color = Data.schedules.color;
+                                schedule.content = Data.schedules.content;
+                                schedule.day_of_month = Data.schedules.day_of_month;
+                                schedule.duration = Data.schedules.duration;
+                                schedule.hour = Data.schedules.hour;
+                                schedule.isAllDay = Data.schedules.isAllDay;
+                                schedule.isCanceled = Data.schedules.isCanceled;
+                                schedule.minute = Data.schedules.minute;
+                                schedule.month = Data.schedules.month;
+                                schedule.year = Data.schedules.year;
+                                flag = true;
+                                nhanvien = dataSchedule;
+                            }
+                        }
+                    })
+                    if(flag==false){
+                        Data.schedules.id = dataSchedule.Schedules.length;
+                        dataSchedule.Schedules.push(Data.schedules);
+                        dataUpdate = dataSchedule.Schedules;
+                        nhanvien = dataSchedule;
+                    }
+                    
                 }
             });
             var Gia_tri_Cap_nhat = {
                 $set: { Schedules: dataUpdate }
             }
-            console.log(Dieu_kien);
-            console.log(dataUpdate);
+            //console.log(Dieu_kien);
+            //console.log(dataUpdate);
             //du_lieu.Danh_sach_Cau_hoi.question_list = Cau_hoi.question_list;
             kq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
             if (kq == "") {
@@ -187,11 +224,17 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                 //console.log(userDB)
                 if(user.UserName.trim() == userDB.Account.UserName.trim())
                 {
-                    if( user.Password.trim() == cryptr.decrypt(userDB.Account.Password))
-                    {
-                        checkLogin = true;
-                        user_return = userDB;
-                    }
+                    try{
+                        if (bcrypt.compareSync(user.Password, userDB.Account.Password) || user.Password == cryptr.decrypt(userDB.Account.Password)) {
+                            checkLogin = true;
+                            user_return = userDB;
+                        } 
+                    }catch(e){}
+                    // if( user.Password.trim() == cryptr.decrypt(userDB.Account.Password))
+                    // {
+                    //     checkLogin = true;
+                    //     user_return = userDB;
+                    // }
                 }
             })
 

@@ -25,7 +25,8 @@ var bcrypt = require('bcrypt');
 var salt = bcrypt.genSaltSync(10);
 
 var du_lieu = {}
-
+var list_delete_Schedule = [];
+var list_schedule_add = [];
 var danh_sach_nguoi_dung = database.get_list_nhan_vien();
 var kq = "";
 danh_sach_nguoi_dung.then(kq => {
@@ -67,7 +68,23 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
             dap_ung.setHeader('Access-Control-Allow-Credentials', true);
             chuoi_kq = chuoi_nhan;
-            dap_ung.end(chuoi_kq);
+            var result = JSON.stringify(list_delete_Schedule);
+            list_delete_Schedule = [];
+            dap_ung.end(result);
+        }
+        else if (ma_so_xu_ly == "VAThem_Schedule_winform") {
+
+            console.log("ok kết nối thành công");
+            console.log(chuoi_nhan);
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            chuoi_kq = chuoi_nhan;
+            //dap_ung.end(JSON.stringify(list_schedule_add));
+            var result = JSON.stringify(list_schedule_add);
+            list_schedule_add = [];
+            dap_ung.end(result);
         }
         else if (ma_so_xu_ly == "VAThem_nhan_vien_moi_mssql") {
             var nhanvien = JSON.parse(chuoi_nhan);
@@ -171,6 +188,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                                 dataSchedule.Schedules.splice(index, 1);
                                 console.log("====>"+index);
                                 flag = true;
+                                list_delete_Schedule.push(schedule.id);
                                 nhanvien = dataSchedule;
                             }
                             else{
@@ -191,6 +209,7 @@ var server = http.createServer((yeu_cau, dap_ung) => {
                         }
                     })
                     if(flag==false){
+                        list_schedule_add.push(Data.schedules);
                         Data.schedules.id = dataSchedule.Schedules.length;
                         dataSchedule.Schedules.push(Data.schedules);
                         dataUpdate = dataSchedule.Schedules;
@@ -206,6 +225,76 @@ var server = http.createServer((yeu_cau, dap_ung) => {
             //console.log(dataUpdate);
             //du_lieu.Danh_sach_Cau_hoi.question_list = Cau_hoi.question_list;
             kq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
+            if (kq == "") {
+                chuoi_kq = "OK"
+            } else {
+                chuoi_kq = "Error"
+            }
+
+            dap_ung.end(chuoi_kq);
+        }
+        else if (ma_so_xu_ly == "VAThem_Lich_bieu_Tu_Winform") {
+            var kq = ""
+            var Data = JSON.parse(chuoi_nhan)
+            dap_ung.setHeader("Access-Control-Allow-Origin", '*')
+            dap_ung.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+            dap_ung.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type');
+            dap_ung.setHeader('Access-Control-Allow-Credentials', true);
+            console.log("Vào lịch nè");
+            //console.log(Data);
+            var Dieu_kien = { "Email": Data.username }
+            var dataUpdate = [];
+            var nhanvien = {};
+            du_lieu.danh_sach_nguoi_dung.forEach(dataSchedule => {
+                if (dataSchedule.Account.UserName.trim() == Data.username.trim()) {
+                    var flag = false;
+                    //console.log(dataSchedule.Schedules)
+                    console.log(Data)
+                    
+                    dataSchedule.Schedules.forEach(schedule=>{
+                        //console.log(schedule)
+                        if(Data.schedules.id == schedule.id)
+                        {
+                            if(Data.schedules.day_of_month == 0 && Data.schedules.hour == 0 && Data.schedules.minute == 0 && Data.schedules.year == 0)
+                            {
+                                var index =  dataSchedule.Schedules.indexOf(schedule);
+                                dataSchedule.Schedules.splice(index, 1);
+                                console.log("====>"+index);
+                                flag = true;
+                                nhanvien = dataSchedule;
+                            }
+                            else{
+                                console.log(schedule);
+                                schedule.color = Data.schedules.color;
+                                schedule.content = Data.schedules.content;
+                                schedule.day_of_month = Data.schedules.day_of_month;
+                                schedule.duration = Data.schedules.duration;
+                                schedule.hour = Data.schedules.hour;
+                                schedule.isAllDay = Data.schedules.isAllDay;
+                                schedule.isCanceled = Data.schedules.isCanceled;
+                                schedule.minute = Data.schedules.minute;
+                                schedule.month = Data.schedules.month;
+                                schedule.year = Data.schedules.year;
+                                flag = true;
+                                nhanvien = dataSchedule;
+                            }
+                        }
+                    })
+                    if(flag==false){
+                        dataSchedule.Schedules.push(Data.schedules);
+                        dataUpdate = dataSchedule.Schedules;
+                        nhanvien = dataSchedule;
+                    }
+                    
+                }
+            });
+            var Gia_tri_Cap_nhat = {
+                $set: { Schedules: dataUpdate }
+            }
+            //console.log(Dieu_kien);
+            //console.log(dataUpdate);
+            //du_lieu.Danh_sach_Cau_hoi.question_list = Cau_hoi.question_list;
+            hoankq = database.Them_lich_bieu('Employee', nhanvien, nhanvien.Account.UserName)
             if (kq == "") {
                 chuoi_kq = "OK"
             } else {

@@ -14,7 +14,7 @@
   "dependencies": {
     "bcrypt": "^5.0.0",
     "cryptr": "^6.0.2",
-    "firebase-admin": "^8.13.0",
+    "firebase-admin": "^11.4.1",
     "nodemailer": "^6.4.11",
     "random-number": "0.0.9"
   }
